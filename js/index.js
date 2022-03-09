@@ -1,3 +1,5 @@
+//! ВЫБОР СПОСОБА СОРТИРОВКИ (order) И ПЕРИОДА (period) - ВЫПАДАЮЩИЕ СПИСКИ 
+
 const optionBtnOrder = document.querySelector('.option__btn_order');
 const optionBtnPeriod = document.querySelector('.option__btn_period');
 const optionListOrder = document.querySelector('.option__list_order');
@@ -53,3 +55,22 @@ optionListPeriod.addEventListener('click', (event) => {
 });
 
 
+//! ВЫБОР ГОРОДА
+
+const topCityBtn = document.querySelector('.top__city');
+const cityBox = document.querySelector('.city');
+const crossCityClose = document.querySelector('.city__close');
+const cityRegionList = document.querySelector('.city__region-list');
+
+topCityBtn.addEventListener('click', (event) => {
+	cityBox.classList.toggle('city_active');
+});
+
+cityRegionList.addEventListener('click', (event) => {
+	const targetCity = event.target;
+
+	if (targetCity.classList.contains('city__link')) {
+		topCityBtn.textContent = targetCity.textContent;  //! меняем надпись
+		cityBox.classList.remove('city_active');  //! после выбора города убираем меню с городами
+	}
+});
