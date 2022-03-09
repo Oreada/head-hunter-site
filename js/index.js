@@ -74,3 +74,37 @@ cityRegionList.addEventListener('click', (event) => {
 		cityBox.classList.remove('city_active');  //! после выбора города убираем меню с городами
 	}
 });
+
+crossCityClose.addEventListener('click', (event) => {
+	cityBox.classList.remove('city_active');
+});
+
+
+//! МОДАЛЬНОЕ ОКНО - ОТКРЫВАЕТСЯ ПО КЛИКУ НА КНОПКУ "ОТКЛИКНУТЬСЯ" И ПО ЗАГОЛОВКУ ВАКАНСИИ
+
+const overlayVacancy = document.querySelector('.overlay_vacancy');
+const resultList = document.querySelector('.result__list');
+
+resultList.addEventListener('click', (event) => {
+	//! если есть атрибут data-vacancy (а он есть у ссылок ".vacancy__open-modal": одна в заголовке, др. в "Откликнуться"), то выполнить код:
+	if (event.target.hasAttribute('data-vacancy')) {
+		event.preventDefault();  //! чтобы не добавлялось значение из href="#" (поведение ссылки по умолчанию)
+		overlayVacancy.classList.add('overlay_active');  //! показываем модальное окно
+	};
+});
+
+document.addEventListener("click", function (event) {
+
+	//! если кликнули на крестик
+	if (event.target.classList.contains('modal__close')) {
+		overlayVacancy.classList.remove('overlay_active');
+	};
+
+	//! если кликнули не внутри окна и не по ссылкам для открытия окна
+	if (!event.target.closest('.modal') && !event.target.hasAttribute('data-vacancy')) {
+		overlayVacancy.classList.remove('overlay_active');  //! то удаляем класс 'overlay_active', т.е. убираем модальное окно
+	};
+});
+
+
+
