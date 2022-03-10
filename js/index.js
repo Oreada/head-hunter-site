@@ -110,6 +110,7 @@ document.addEventListener("click", function (event) {
 //! ВЫВОД КАРТОЧЕК С ВАКАНСИЯМИ (В СПИСОК ".result__list")
 
 const createCardVacancy = (vacancy) => {
+	console.log(vacancy);
 	const cardVacancy = document.createElement('li');  //! т.к. каждая карточка является пунктом списка ".result__list"
 	cardVacancy.classList.add('result__item');  //! это <li class="result__item">
 
@@ -139,13 +140,22 @@ const createCardVacancy = (vacancy) => {
 
 const renderCards = (data) => {
 	resultList.textContent = '';  //! очищаем список с карточками-вакансиями
-
 	const cards = data.map((item) => createCardVacancy(item));  //! создаём массив карточек-вакансий
 	// console.log(cards);
 	resultList.append(...cards);  //! добавляем только что созданные карточки-вакансии в список ".result__list"
 };
 
-renderCards(['Hi', 'Sorry', 'Rain', 'Sun', 'Mountain']);
+const getData = () => fetch('http://localhost:3000/api/vacancy').then(response => response.json());  //! получаем данные из api и преобразовываем
+
+//! если убрать из функции init слова async и await, то в data мы получим Promise, в котором есть массив, а нам нужен только сам массив, поэтому:
+const init = async () => {
+	const data = await getData();
+	// console.log(data);  //! получаем массив данных для карточек-вакансий
+	renderCards(data);
+};
+
+init();
+
 
 
 
