@@ -1,4 +1,4 @@
-//! ВЫБОР СПОСОБА СОРТИРОВКИ (order) И ПЕРИОДА (period) - ВЫПАДАЮЩИЕ СПИСКИ 
+//! ВЫБОР СПОСОБА СОРТИРОВКИ (order) И ПЕРИОДА (period) - ВЫПАДАЮЩИЕ СПИСКИ
 
 const optionBtnOrder = document.querySelector('.option__btn_order');
 const optionBtnPeriod = document.querySelector('.option__btn_period');
@@ -62,7 +62,7 @@ const cityBox = document.querySelector('.city');
 const crossCityClose = document.querySelector('.city__close');
 const cityRegionList = document.querySelector('.city__region-list');
 
-topCityBtn.addEventListener('click', (event) => {
+topCityBtn.addEventListener('click', () => {
 	cityBox.classList.toggle('city_active');
 });
 
@@ -75,7 +75,7 @@ cityRegionList.addEventListener('click', (event) => {
 	}
 });
 
-crossCityClose.addEventListener('click', (event) => {
+crossCityClose.addEventListener('click', () => {
 	cityBox.classList.remove('city_active');
 });
 
@@ -83,7 +83,7 @@ crossCityClose.addEventListener('click', (event) => {
 //! МОДАЛЬНОЕ ОКНО - ОТКРЫВАЕТСЯ ПО КЛИКУ НА КНОПКУ "ОТКЛИКНУТЬСЯ" И ПО ЗАГОЛОВКУ ВАКАНСИИ
 
 const overlayVacancy = document.querySelector('.overlay_vacancy');
-const resultList = document.querySelector('.result__list');
+const resultList = document.querySelector('.result__list');  //! список с карточками-вакансиями
 
 resultList.addEventListener('click', (event) => {
 	//! если есть атрибут data-vacancy (а он есть у ссылок ".vacancy__open-modal": одна в заголовке, др. в "Откликнуться"), то выполнить код:
@@ -105,6 +105,48 @@ document.addEventListener("click", function (event) {
 		overlayVacancy.classList.remove('overlay_active');  //! то удаляем класс 'overlay_active', т.е. убираем модальное окно
 	};
 });
+
+
+//! ВЫВОД КАРТОЧЕК С ВАКАНСИЯМИ (В СПИСОК ".result__list")
+
+const createCardVacancy = (vacancy) => {
+	const cardVacancy = document.createElement('li');  //! т.к. каждая карточка является пунктом списка ".result__list"
+	cardVacancy.classList.add('result__item');  //! это <li class="result__item">
+
+	cardVacancy.insertAdjacentHTML('afterbegin', `
+		<article class="vacancy">
+			<h2 class="vacancy__title">
+				<a class="vacancy__open-modal" href="#" data-vacancy="3515">${vacancy}</a>
+			</h2>
+			<p class="vacancy__compensation">120&nbsp;000 – 150&nbsp;000 руб.</p>
+			<p class="vacancy__work-schedule">Можно работать из дома</p>
+			<div class="vacancy__employer">
+				<p class="vacancy__employer-title">HFLabs</p>
+				<p class="vacancy__employer-address">Москва</p>
+			</div>
+			<p class="vacancy__description">Ожидаем, решения задач связанных с визуальными изменениями на сайтах сервисов, к таковым задачам относится, как верстка ...</p>
+			<p class="vacancy__date">
+				<time datetime="2022-02-25">25.02.2022</time>
+			</p>
+			<div class="vacancy__wrapper-btn">
+				<a class="vacancy__response vacancy__open-modal" href="#" data-vacancy="3515">Откликнуться</a>
+				<button class="vacancy__contacts">Показать контакты</button>
+			</div>
+		</article>
+	`);
+	return cardVacancy;
+};
+
+const renderCards = (data) => {
+	resultList.textContent = '';  //! очищаем список с карточками-вакансиями
+
+	const cards = data.map((item) => createCardVacancy(item));  //! создаём массив карточек-вакансий
+	// console.log(cards);
+	resultList.append(...cards);  //! добавляем только что созданные карточки-вакансии в список ".result__list"
+};
+
+renderCards(['Hi', 'Sorry', 'Rain', 'Sun', 'Mountain']);
+
 
 
 
