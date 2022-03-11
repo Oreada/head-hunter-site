@@ -111,26 +111,38 @@ document.addEventListener("click", function (event) {
 
 const createCardVacancy = (vacancy) => {
 	console.log(vacancy);
+	//! деструктуризация - создаём переменные, вытаскивая их значение из объекта по такому же названию
+	//! без деструктуризации нужно было бы обращаться к значениям из объекта так: vacancy.title, vacancy.id и так далее
+	const {
+		id,
+		title,
+		compensation,
+		workSchedule,
+		employer,
+		address,
+		description,
+		date,
+	} = vacancy;  //! деструктуризация
 	const cardVacancy = document.createElement('li');  //! т.к. каждая карточка является пунктом списка ".result__list"
 	cardVacancy.classList.add('result__item');  //! это <li class="result__item">
 
 	cardVacancy.insertAdjacentHTML('afterbegin', `
 		<article class="vacancy">
 			<h2 class="vacancy__title">
-				<a class="vacancy__open-modal" href="#" data-vacancy="3515">${vacancy}</a>
+				<a class="vacancy__open-modal" href="#" data-vacancy="${id}">${title}</a>
 			</h2>
-			<p class="vacancy__compensation">120&nbsp;000 – 150&nbsp;000 руб.</p>
-			<p class="vacancy__work-schedule">Можно работать из дома</p>
+			<p class="vacancy__compensation">${compensation}</p>
+			<p class="vacancy__work-schedule">${workSchedule}</p>
 			<div class="vacancy__employer">
-				<p class="vacancy__employer-title">HFLabs</p>
-				<p class="vacancy__employer-address">Москва</p>
+				<p class="vacancy__employer-title">${employer}</p>
+				<p class="vacancy__employer-address">${address}</p>
 			</div>
-			<p class="vacancy__description">Ожидаем, решения задач связанных с визуальными изменениями на сайтах сервисов, к таковым задачам относится, как верстка ...</p>
+			<p class="vacancy__description">${description}</p>
 			<p class="vacancy__date">
-				<time datetime="2022-02-25">25.02.2022</time>
+				<time datetime="${date}">${date}</time>
 			</p>
 			<div class="vacancy__wrapper-btn">
-				<a class="vacancy__response vacancy__open-modal" href="#" data-vacancy="3515">Откликнуться</a>
+				<a class="vacancy__response vacancy__open-modal" href="#" data-vacancy="${id}">Откликнуться</a>
 				<button class="vacancy__contacts">Показать контакты</button>
 			</div>
 		</article>
