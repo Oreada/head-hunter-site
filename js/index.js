@@ -157,7 +157,15 @@ const renderCards = (data) => {
 	resultList.append(...cards);  //! добавляем только что созданные карточки-вакансии в список ".result__list"
 };
 
-const getData = () => fetch('http://localhost:3000/api/vacancy').then(response => response.json());  //! получаем данные из api и преобразовываем
+//! получаем данные из api и преобразовываем
+const getData = ({ search } = {}) => {  //! по умолчанию - пустой объект, т.к. search может и не передаваться
+
+	if (search) {
+		return fetch(`http://localhost:3000/api/vacancy?search=${search}`).then(response => response.json());
+	}
+
+	return fetch('http://localhost:3000/api/vacancy').then(response => response.json());
+};
 
 //! если убрать из функции init слова async и await, то в data мы получим Promise, в котором есть массив, а нам нужен только сам массив, поэтому:
 const init = async () => {
@@ -169,6 +177,28 @@ const init = async () => {
 init();
 
 
+//! ПОИСК ПО ВАКАНСИЯМ
 
+const formSearch = document.querySelector('.bottom__search');
+
+formSearch.addEventListener('submit', async (event) => {
+	event.preventDefault(); //! отменяем стандартное поведение 'submit' - перезагрузку страницы
+
+	const inputSearch = formSearch.elements.search;  //! получаем input из этой формы по его имени (name="search")
+	const textSearch = inputSearch.value;  //! получаем значение input (то, что написал пользователь в поле поиска)
+
+	if (textSearch.length > 2) {
+		inputSearch.style.borderColor = '';
+
+		const data = await getData({ search: textSearch }) //! деструктуризация. Получаем только те данные, которые ищем
+		renderCards(data); //! вызываем функцию вывода списка карточек именно с теми данными, которые ищем
+		formSearch.reset();  //! очистка формы поиска
+	} else {
+		inputSearch.style.borderColor = 'red';
+		setTimeout(() => {
+			inputSearch.style.borderColor = '';
+		}, 2000);
+	};
+});
 
 
