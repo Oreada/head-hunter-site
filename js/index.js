@@ -1,3 +1,10 @@
+//! ФУНКЦИЯ ДЛЯ ВЕРНОГО СКЛОНЕНИЯ СУЩ. "ВАКАНСИЯ" РЯДОМ С НОМЕРОМ, ОБОЗНАЧАЮЩИМ КОЛИЧЕСТВО
+
+const declOfNum = (n, titles) => {
+	return n + ' ' + titles[n % 10 === 1 && n % 100 !== 11 ?
+		0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2];
+};
+
 //! ВЫБОР СПОСОБА СОРТИРОВКИ (order) И ПЕРИОДА (period) - ВЫПАДАЮЩИЕ СПИСКИ
 
 const optionBtnOrder = document.querySelector('.option__btn_order');
@@ -155,10 +162,16 @@ const renderCards = (data) => {
 	const cards = data.map((item) => createCardVacancy(item));  //! создаём массив карточек-вакансий
 	// console.log(cards);
 	resultList.append(...cards);  //! добавляем только что созданные карточки-вакансии в список ".result__list"
+
+	//! записываем в заголовок количество найденных вакансий - с вызовом функции declOfNum для правильного склонения
+	const numberFoundVacancy = document.querySelector('.found__number');
+	numberFoundVacancy.textContent = `${declOfNum(cards.length, ['вакансия', 'вакансии', 'вакансий'])}`;
 };
 
 //! получаем данные из api и преобразовываем
 const getData = ({ search } = {}) => {  //! по умолчанию - пустой объект, т.к. search может и не передаваться
+
+	// console.log(search);
 
 	if (search) {
 		return fetch(`http://localhost:3000/api/vacancy?search=${search}`).then(response => response.json());
@@ -192,6 +205,10 @@ formSearch.addEventListener('submit', async (event) => {
 
 		const data = await getData({ search: textSearch }) //! деструктуризация. Получаем только те данные, которые ищем
 		renderCards(data); //! вызываем функцию вывода списка карточек именно с теми данными, которые ищем
+
+		const searchItemVacancy = document.querySelector('.found__item');
+		searchItemVacancy.textContent = textSearch;  //! записываем в заголовок тот запрос, который вводили в строку поиска
+
 		formSearch.reset();  //! очистка формы поиска
 	} else {
 		inputSearch.style.borderColor = 'red';
@@ -200,5 +217,13 @@ formSearch.addEventListener('submit', async (event) => {
 		}, 2000);
 	};
 });
+
+
+
+
+
+
+
+
 
 
