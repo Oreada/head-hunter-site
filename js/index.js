@@ -163,7 +163,7 @@ const createModal = (data) => {
 	descriptionElem.textContent = description;
 
 	const skillsElem = document.createElement('div');
-	skillsElem.classList.add('modal__skills skills');
+	skillsElem.classList.add('modal__skills', 'skills');
 
 	const skillsTitleElem = document.createElement('h3');
 	skillsTitleElem.classList.add('skills__title');
@@ -266,6 +266,7 @@ document.addEventListener("click", function (event) {
 	//! если кликнули не внутри окна и не по ссылкам для открытия окна
 	if (!event.target.closest('.modal') && !event.target.hasAttribute('data-vacancy')) {
 		overlayVacancy.classList.remove('overlay_active');  //! то удаляем класс 'overlay_active', т.е. убираем модальное окно
+		overlayVacancy.querySelector('.modal').remove();
 	};
 });
 
