@@ -1,13 +1,24 @@
 //! РАБОТА С API
 //! получаем данные из api и преобразовываем
-const getData = ({ search, id } = {}) => {  //! по умолчанию - пустой объект, т.к. search может и не передаваться
-	// console.log(search);
+const getData = ({ search, id, country, city } = {}) => {  //! по умолчанию - пустой объект, т.к. параметры могут и не передаваться
+	console.log(country);
+	console.log(city);
+
+	let url = `http://localhost:3000/api/vacancy/${id ? id : ''}`;
 
 	if (search) {
-		return fetch(`http://localhost:3000/api/vacancy?search=${search}`).then(response => response.json());
-	}
+		url = `http://localhost:3000/api/vacancy?search=${search}`;
+	};
 
-	return fetch(`http://localhost:3000/api/vacancy/${id ? id : ''}`).then(response => response.json());
+	if (city) {
+		url = `http://localhost:3000/api/vacancy?city=${city}`;
+	};
+
+	if (country) {
+		url = `http://localhost:3000/api/vacancy?country=${country}`;
+	};
+
+	return fetch(url).then(response => response.json());
 };
 
 //! если убрать из функции init слова async и await, то в data мы получим Promise, в котором есть массив, а нам нужен только сам массив, поэтому:
@@ -94,10 +105,23 @@ topCityBtn.addEventListener('click', () => {
 	cityBox.classList.toggle('city_active');
 });
 
-cityRegionList.addEventListener('click', (event) => {
+cityRegionList.addEventListener('click', async (event) => {
 	const targetCity = event.target;
 
 	if (targetCity.classList.contains('city__link')) {
+		//! два варианта достать адрес - city или country (записаны в двух console.log-ах ниже):
+		// console.log(targetCity.getAttribute('href').substring(1));
+		// console.log(new URL(targetCity.href).hash.substring(1));
+
+		const hash = new URL(targetCity.href).hash.substring(1);  //! получаем city или country
+		const option = {
+			[hash]: targetCity.textContent,
+		};
+		// console.log(option);  //! {city: 'Львов'} или {country: 'Казахстан'} или ... - смотря что нажали
+
+		const data = await getData(option);
+		renderCards(data);
+
 		topCityBtn.textContent = targetCity.textContent;  //! меняем надпись
 		cityBox.classList.remove('city_active');  //! после выбора города убираем меню с городами
 	}
@@ -266,7 +290,9 @@ document.addEventListener("click", function (event) {
 	//! если кликнули не внутри окна и не по ссылкам для открытия окна
 	if (!event.target.closest('.modal') && !event.target.hasAttribute('data-vacancy')) {
 		overlayVacancy.classList.remove('overlay_active');  //! то удаляем класс 'overlay_active', т.е. убираем модальное окно
-		overlayVacancy.querySelector('.modal').remove();
+		if (overlayVacancy.querySelector('.modal')) {
+			overlayVacancy.querySelector('.modal').remove();
+		};
 	};
 });
 
