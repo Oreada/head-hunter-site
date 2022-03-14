@@ -1,4 +1,5 @@
 //! РАБОТА С API
+
 //! получаем данные из api и преобразовываем
 const getData = ({ search, id, country, city } = {}) => {  //! по умолчанию - пустой объект, т.к. параметры могут и не передаваться
 	console.log(country);
@@ -21,11 +22,14 @@ const getData = ({ search, id, country, city } = {}) => {  //! по умолча
 	return fetch(url).then(response => response.json());
 };
 
+let data = [];
+
 //! если убрать из функции init слова async и await, то в data мы получим Promise, в котором есть массив, а нам нужен только сам массив, поэтому:
 const init = async () => {
-	const data = await getData();
+	data = await getData();
 	// console.log(data);  //! получаем массив данных для карточек-вакансий
-	renderCards(data);
+	const newData = sortData();  //! сортируем и фильтруем
+	renderCards(newData); //! выводим отсортированные и отфильтрованные по умолчанию карточки-вакансии - по стартовым параметрам в выпадающих списках
 };
 
 
@@ -47,6 +51,9 @@ const optionListPeriod = document.querySelector('.option__list_period');
 const orderItems = optionListOrder.querySelectorAll('.option__item');  //! массив из пунктов меню '.option__list_order'
 const periodItems = optionListPeriod.querySelectorAll('.option__item');  //! массив из пунктов меню '.option__list_period'
 
+const orderBy = document.querySelector('#order_by');
+const searchPeriod = document.querySelector('#search_period');
+
 //! при нажатии кнопки появляется список с пунктами
 optionBtnOrder.addEventListener('click', () => {
 	optionListOrder.classList.toggle('option__list_active');
@@ -59,12 +66,36 @@ optionBtnPeriod.addEventListener('click', () => {
 	optionListOrder.classList.remove('option__list_active');  //! если щёлкаем по одному списку, то другой нужно закрыть
 });
 
+const filterData = () => {
+	const dateFilter = new Date();
+	dateFilter.setDate(dateFilter.getDate() - searchPeriod.value);
+	return data.filter((item) => new Date(item.date).getTime() > dateFilter);
+};
+
+const sortData = () => {
+	switch (orderBy.value) {
+		case 'down':
+			data.sort((a, b) => a.minCompensation > b.minCompensation ? 1 : -1);
+			break;
+		case 'up':
+			data.sort((a, b) => b.minCompensation > a.minCompensation ? 1 : -1);
+			break;
+		default:
+			data.sort((a, b) => new Date(a.date).getTime() > new Date(b.date).getTime() ? 1 : -1);
+			break;
+	};
+	return filterData();
+};
+
 //! обработка нажатия пункта выпадающего меню - меню ".option__list_order"
 optionListOrder.addEventListener('click', (event) => {
 	const targetOrder = event.target;
 
 	if (targetOrder.classList.contains('option__item')) {
 		optionBtnOrder.textContent = targetOrder.textContent;  //! текстовое содержимое кнопки '.option__btn_order' будет равно содержимому пункта меню
+		orderBy.value = targetOrder.dataset.sort;  //! получаем тип сортировки из дата-атрибута
+		const newData = sortData();  //! сортируем и фильтруем
+		renderCards(newData); //! выводим отсортированные и отфильтрованные заданным образом карточки-вакансии
 		for (const element of orderItems) {
 			if (element === targetOrder) {
 				element.classList.add('option__item_active');
@@ -82,6 +113,9 @@ optionListPeriod.addEventListener('click', (event) => {
 
 	if (targetPeriod.classList.contains('option__item')) {
 		optionBtnPeriod.textContent = targetPeriod.textContent;  //! текстовое содержимое кнопки '.option__list_period' будет равно содержимому пункта меню
+		searchPeriod.value = targetPeriod.dataset.date;  //! получаем тип фильтрации из дата-атрибута
+		const tempData = filterData();  //! фильтруем
+		renderCards(tempData);  //! выводим отфильтрованные заданным образом карточки-вакансии
 		for (const element of periodItems) {
 			if (element === targetPeriod) {
 				element.classList.add('option__item_active');
@@ -119,12 +153,13 @@ cityRegionList.addEventListener('click', async (event) => {
 		};
 		// console.log(option);  //! {city: 'Львов'} или {country: 'Казахстан'} или ... - смотря что нажали
 
-		const data = await getData(option);
-		renderCards(data);
+		data = await getData(option);
+		const newData = sortData();  //! сортируем и фильтруем
+		renderCards(newData); //! выводим отсортированные и отфильтрованные заданным образом карточки-вакансии - по конкретному city или country
 
 		topCityBtn.textContent = targetCity.textContent;  //! меняем надпись
 		cityBox.classList.remove('city_active');  //! после выбора города убираем меню с городами
-	}
+	};
 });
 
 crossCityClose.addEventListener('click', () => {
@@ -274,7 +309,7 @@ resultList.addEventListener('click', async (event) => {
 		event.preventDefault();  //! чтобы не добавлялось значение из href="#" (поведение ссылки по умолчанию)
 		overlayVacancy.classList.add('overlay_active');  //! показываем модальное окно
 
-		const data = await getData({ id: event.target.dataset.vacancy });
+		const data = await getData({ id: event.target.dataset.vacancy });  //! тут вывод только одной вакансии, поэтому тут новая const data
 		const modal = createModal(data);
 		overlayVacancy.append(modal);
 	};
@@ -361,9 +396,10 @@ formSearch.addEventListener('submit', async (event) => {
 	if (textSearch.length > 2) {
 		inputSearch.style.borderColor = '';
 
-		const data = await getData({ search: textSearch }) //! деструктуризация. Получаем только те данные, которые ищем
+		data = await getData({ search: textSearch }) //! деструктуризация. И получаем только те данные, которые ищем
 		console.log(data);
-		renderCards(data); //! вызываем функцию вывода списка карточек именно с теми данными, которые ищем
+		const newData = sortData();  //! сортируем и фильтруем
+		renderCards(newData); //! выводим отсортированные и отфильтрованные заданным образом карточки-вакансии - именно с теми данными, которые ищем
 
 		//! записываем в заголовок количество найденных вакансий - с вызовом функции declOfNum для правильного склонения
 		//! записываем в заголовок тот запрос, который вводили в строку поиска
